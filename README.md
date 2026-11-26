@@ -5,6 +5,18 @@ DevKit bundles 9 essential utilities into a single-page app with zero framework 
 
 ---
 
+## 🌐 Live Application
+
+- **Live Web App**: [https://devkit-i9j3.onrender.com](https://devkit-i9j3.onrender.com)
+- **Live Test Suite**: [https://devkit-i9j3.onrender.com/static/js/tests.html](https://devkit-i9j3.onrender.com/static/js/tests.html)
+- **Health Check API**: [https://devkit-i9j3.onrender.com/api/health](https://devkit-i9j3.onrender.com/api/health)
+- **GitHub Repository**: [https://github.com/terli-mahesh-cse/devkit](https://github.com/terli-mahesh-cse/devkit)
+
+> [!NOTE]
+> **Free Tier Sleep Notice**: On Render's free tier, the web service automatically spins down after 15 minutes of inactivity. When accessed, Render wakes it back up in ~30–50 seconds.
+
+---
+
 ## ✨ Features (9 Tools)
 
 1. **Word Counter**: Real-time counter for words, characters (with and without spaces), sentences, paragraphs, and estimated reading time (`words / 200`). Live tweens and edge-case handling for multiple spaces, newlines, and empty inputs.
@@ -39,7 +51,7 @@ devkit/
 ├── app.py                  # Python Flask server (GET /, POST /api/format-json, GET /api/health)
 ├── requirements.txt        # Flask and Gunicorn dependencies
 ├── render.yaml             # Render infrastructure as code
-├── README.md               # Documentation and deployment guide
+├── README.md               # Documentation and project guide
 ├── .gitignore              # Git ignore rules for venv, caches, env
 ├── templates/
 │   └── index.html          # Semantic single-page HTML
@@ -114,8 +126,8 @@ Open [http://localhost:5000](http://localhost:5000) in your browser.
 ## 🧪 Running Automated Self-Tests
 
 DevKit includes a built-in automated test suite covering all pure functions and edge cases:
-1. Start the server (`python app.py`).
-2. Open [http://localhost:5000/static/js/tests.html](http://localhost:5000/static/js/tests.html) in any modern browser.
+1. Start the server (`python app.py`) or visit the live deployment.
+2. Open [https://devkit-i9j3.onrender.com/static/js/tests.html](https://devkit-i9j3.onrender.com/static/js/tests.html) (or `http://localhost:5000/static/js/tests.html` locally).
 3. Tests verify:
    - Case converters (all 7 styles, empty string, single word, hyphens, underscores, camelCase)
    - Base64 Unicode roundtrip (English, emojis, Hindi, Telugu, and 25KB+ chunked sequences)
@@ -126,51 +138,3 @@ DevKit includes a built-in automated test suite covering all pure functions and 
    - URL encoding / decoding
    - UUID v4 regex validation
    - SHA-1 and SHA-256 standard test vectors
-
----
-
-## 🚀 GitHub Push Steps
-
-```bash
-# Initialize git (if not already done)
-git init
-
-# Stage all files
-git add .
-
-# Commit changes
-git commit -m "feat: complete devkit student toolbox"
-
-# Create a new repository on GitHub (e.g. devkit)
-# Link and push:
-git remote add origin https://github.com/<your-username>/devkit.git
-git branch -M main
-git push -u origin main
-```
-
----
-
-## 🌐 Deploy to Render
-
-### Option A: Using `render.yaml` (Blueprint)
-1. In the [Render Dashboard](https://dashboard.render.com/), click **New** → **Blueprint**.
-2. Connect your GitHub repository.
-3. Render reads `render.yaml` automatically:
-   - **Environment**: Python 3.11.9
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn app:app`
-   - **Health Check**: `/api/health`
-4. Click **Apply**.
-
-### Option B: Manual Web Service
-1. In the [Render Dashboard](https://dashboard.render.com/), click **New** → **Web Service**.
-2. Connect your repository.
-3. Configure settings:
-   - **Runtime**: Python 3
-   - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `gunicorn app:app`
-   - **Health Check Path**: `/api/health`
-4. Click **Deploy Web Service**.
-
-> [!NOTE]
-> **Free Tier Sleep Notice**: On Render's free tier, web services spin down after 15 minutes of inactivity. When a new request arrives, Render spins up the service automatically in ~30–50 seconds.
