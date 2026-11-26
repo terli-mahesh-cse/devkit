@@ -269,8 +269,8 @@
             <div id="colorContrastBadge" class="badge badge-success">WCAG AA &amp; AAA</div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-            <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="color-grid">
+            <div class="color-pane">
               <div style="display: flex; align-items: center; gap: 16px;">
                 <label for="colorPickerInput" class="sr-only">Choose color</label>
                 <input type="color" id="colorPickerInput" value="#7c3aed" style="width: 54px; height: 54px; border: none; border-radius: var(--radius-md); cursor: pointer; background: transparent;">
@@ -283,27 +283,27 @@
               <!-- HEX Field -->
               <div style="display: flex; align-items: center; gap: 8px;">
                 <label for="colorHexInput" style="width: 50px; font-weight: 600; font-size: 12px; color: var(--text-secondary);">HEX</label>
-                <input type="text" id="colorHexInput" class="text-input" value="#7c3aed" style="flex: 1;" spellcheck="false">
+                <input type="text" id="colorHexInput" class="text-input" value="#7c3aed" style="flex: 1; min-width: 0;" spellcheck="false">
                 <button id="colorCopyHexBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
               </div>
 
               <!-- RGB Field -->
               <div style="display: flex; align-items: center; gap: 8px;">
                 <label for="colorRgbInput" style="width: 50px; font-weight: 600; font-size: 12px; color: var(--text-secondary);">RGB</label>
-                <input type="text" id="colorRgbInput" class="text-input" value="rgb(124, 58, 237)" style="flex: 1;" spellcheck="false">
+                <input type="text" id="colorRgbInput" class="text-input" value="rgb(124, 58, 237)" style="flex: 1; min-width: 0;" spellcheck="false">
                 <button id="colorCopyRgbBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
               </div>
 
               <!-- HSL Field -->
               <div style="display: flex; align-items: center; gap: 8px;">
                 <label for="colorHslInput" style="width: 50px; font-weight: 600; font-size: 12px; color: var(--text-secondary);">HSL</label>
-                <input type="text" id="colorHslInput" class="text-input" value="hsl(262, 83%, 58%)" style="flex: 1;" spellcheck="false">
+                <input type="text" id="colorHslInput" class="text-input" value="hsl(262, 83%, 58%)" style="flex: 1; min-width: 0;" spellcheck="false">
                 <button id="colorCopyHslBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
               </div>
             </div>
 
             <!-- Preview Swatch & Contrast Card -->
-            <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="color-pane">
               <div id="colorSwatchPreview" class="color-swatch-box" style="height: 120px; border-radius: var(--radius-md); background-color: #7c3aed; display: flex; align-items: center; justify-content: space-around; padding: 12px; border: 1px solid var(--border-glass);">
                 <div id="swatchWhiteText" style="color: #ffffff; font-weight: 600; font-size: 16px;">White Text</div>
                 <div id="swatchBlackText" style="color: #000000; font-weight: 600; font-size: 16px;">Black Text</div>

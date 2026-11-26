@@ -313,17 +313,24 @@
 }
 
 /* Standard Input | Output Grid */
-.io-grid {
+.io-grid, .color-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
   align-items: stretch;
 }
 
-.io-pane {
+.io-pane, .color-pane {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+@media (max-width: 900px) {
+  .color-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .pane-label {
