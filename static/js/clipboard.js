@@ -11,6 +11,11 @@ export function showToast(message, type = 'mint') {
     document.body.appendChild(container);
   }
 
+  // Keep at most 2 active toasts to prevent stacking overlap
+  while (container.children.length >= 2) {
+    container.firstChild.remove();
+  }
+
   const toast = document.createElement('div');
   toast.className = `toast toast-${type}`;
   toast.setAttribute('role', 'status');
