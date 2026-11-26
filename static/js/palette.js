@@ -1,6 +1,18 @@
 /**
- * Command Palette (Ctrl/Cmd + K)
+ * Command Palette (Ctrl/Cmd + K) with fuzzy search
  */
+function fuzzyMatch(text, query) {
+  if (!query) return true;
+  const t = text.toLowerCase();
+  const q = query.toLowerCase();
+  if (t.includes(q)) return true;
+  let qIdx = 0;
+  for (let i = 0; i < t.length && qIdx < q.length; i++) {
+    if (t[i] === q[qIdx]) qIdx++;
+  }
+  return qIdx === q.length;
+}
+
 export function initPalette(tools, onSelectTool) {
   const backdrop = document.getElementById('paletteModal');
   const input = document.getElementById('paletteInput');
@@ -28,7 +40,7 @@ export function initPalette(tools, onSelectTool) {
     const query = input.value.trim().toLowerCase();
     filteredTools = tools.filter(t => {
       if (!query) return true;
-      return t.label.toLowerCase().includes(query) || t.id.toLowerCase().includes(query);
+      return fuzzyMatch(t.label, query) || fuzzyMatch(t.id, query) || (t.shortcut && t.shortcut.toLowerCase().includes(query));
     });
 
     if (selectedIndex >= filteredTools.length) {
@@ -37,7 +49,7 @@ export function initPalette(tools, onSelectTool) {
 
     resultsList.innerHTML = '';
     if (filteredTools.length === 0) {
-      resultsList.innerHTML = `<li style="padding: 12px; color: var(--text-muted); text-align: center;">No matching tools found</li>`;
+      resultsList.innerHTML = `<li style="padding: 16px; color: var(--text-muted); text-align: center;">No matching tools found</li>`;
       return;
     }
 
