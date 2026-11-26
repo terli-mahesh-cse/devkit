@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevKit &mdash; Single-Page Developer Toolbox for Students</title>
+  <meta name="description" content="All processing happens in your browser. 9 privacy-first developer utilities.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="/static/css/tokens.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/layout.css">
+  <link rel="stylesheet" href="/static/css/components.css">
+  <link rel="stylesheet" href="/static/css/animations.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar" aria-label="Tool Navigation">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">&lt;/&gt;</div>
+        <div class="brand-name">DevKit</div>
+      </div>
+
+      <button id="openPaletteBtn" class="sidebar-search-btn" type="button" aria-label="Open command palette">
+        <span>Search tools...</span>
+        <span class="kbd-badge">Ctrl K</span>
+      </button>
+
+      <div class="nav-list-wrapper">
+        <div id="navHighlightPill" class="nav-pill-highlight" aria-hidden="true"></div>
+        <ul id="navList" class="nav-list" role="tablist" aria-orientation="vertical">
+          <!-- Populated by main.js registry -->
+        </ul>
+      </div>
+
+      <div class="sidebar-footer">
+        <button id="shortcutsBtn" class="sidebar-action-btn" type="button" title="Keyboard Shortcuts (?)" aria-label="Keyboard Shortcuts">
+          <span style="font-weight: 700;">?</span>
+          <span>Shortcuts</span>
+        </button>
+
+        <button id="themeToggleBtn" class="sidebar-action-btn theme-toggle-btn" type="button" title="Toggle Dark / Light Theme" aria-label="Toggle Dark / Light Theme">
+          <svg id="themeIcon" class="theme-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <span id="themeLabel">Dark</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main id="mainContent" class="main-content">
+      <div class="tagline-bar">
+        <div class="tagline">
+          <span class="tagline-dot" aria-hidden="true"></span>
+          <span>All processing happens in your browser.</span>
+        </div>
+      </div>
+
+      <div class="tool-panels">
+        <!-- 1. Word Counter Panel -->
+        <section id="panel-counter" class="tool-card" role="tabpanel" aria-labelledby="tab-counter" tabindex="0">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h1 class="card-title">Word Counter</h1>
+            </div>
+            <div id="counterBadge" class="badge badge-neutral">0 words</div>
+          </div>
+
+          <div class="metrics-grid" id="counterMetrics">
+            <div class="metric-card">
+              <span class="metric-num" id="metricWords">0</span>
+              <span class="metric-label">Words</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-num" id="metricCharsSpaces">0</span>
+              <span class="metric-label">Characters</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-num" id="metricCharsNoSpaces">0</span>
+              <span class="metric-label">Chars (no space)</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-num" id="metricSentences">0</span>
+              <span class="metric-label">Sentences</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-num" id="metricParagraphs">0</span>
+              <span class="metric-label">Paragraphs</span>
+            </div>
+            <div class="metric-card">
+              <span class="metric-num" id="metricReadingTime">0 min</span>
+              <span class="metric-label">Reading Time</span>
+            </div>
+          </div>
+
+          <div class="io-pane">
+            <label for="counterInput" class="pane-label">Enter or paste text</label>
+            <textarea id="counterInput" class="textarea-box" placeholder="Type or paste your text here..." rows="8"></textarea>
+          </div>
+
+          <div class="action-row">
+            <div class="action-group-left">
+              <button id="counterCopySummaryBtn" class="btn btn-secondary btn-copy" type="button">Copy Summary</button>
+            </div>
+            <div class="action-group-right">
+              <button id="counterClearBtn" class="btn btn-ghost" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="status-line" id="counterStatus" aria-live="polite"></div>
+        </section>
+
+        <!-- 2. JSON Formatter Panel -->
+        <section id="panel-json" class="tool-card" role="tabpanel" aria-labelledby="tab-json" tabindex="0">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h1 class="card-title">JSON Formatter</h1>
+            </div>
+            <div id="jsonBadge" class="badge badge-neutral">Ready</div>
+          </div>
+
+          <div class="io-grid">
+            <div class="io-pane">
+              <div class="pane-label">
+                <label for="jsonInput">Input JSON</label>
+                <span id="jsonSizeLabel" style="font-size: 11px; color: var(--text-muted);">0 B</span>
+              </div>
+              <textarea id="jsonInput" class="textarea-box" placeholder='{"key": "value"}' rows="12"></textarea>
+            </div>
+            <div class="io-pane">
+              <div class="pane-label">
+                <label for="jsonOutput">Formatted Output</label>
+              </div>
+              <textarea id="jsonOutput" class="output-box" readonly placeholder="Output will appear here..." rows="12"></textarea>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <div class="action-group-left">
+              <button id="jsonFormatBtn" class="btn btn-primary" type="button">Format</button>
+              <button id="jsonMinifyBtn" class="btn btn-secondary" type="button">Minify</button>
+              <button id="jsonValidateBtn" class="btn btn-secondary" type="button">Validate</button>
+
+              <label for="jsonIndentSelect" class="sr-only">Indentation</label>
+              <select id="jsonIndentSelect" class="select-input" aria-label="Indentation size">
+                <option value="2">2 Spaces</option>
+                <option value="4">4 Spaces</option>
+                <option value="tab">Tab</option>
+              </select>
+
+              <label class="toggle-wrapper" title="Alphabetically sort JSON object keys">
+                <input type="checkbox" id="jsonSortKeysToggle" class="toggle-input">
+                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                <span>Sort keys</span>
+              </label>
+
+              <label class="toggle-wrapper" title="Enabling sends text to server POST /api/format-json">
+                <input type="checkbox" id="jsonUseServerToggle" class="toggle-input">
+                <span class="toggle-track" aria-hidden="true"><span class="toggle-thumb"></span></span>
+                <span>Use server</span>
+              </label>
+            </div>
+
+            <div class="action-group-right">
+              <button id="jsonCopyBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
+              <button id="jsonClearBtn" class="btn btn-ghost" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="status-line" id="jsonStatus" aria-live="polite"></div>
+        </section>
+
+        <!-- 3. Case Converter Panel -->
+        <section id="panel-case" class="tool-card" role="tabpanel" aria-labelledby="tab-case" tabindex="0">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h1 class="card-title">Case Converter</h1>
+            </div>
+            <div id="caseBadge" class="badge badge-neutral">Pure Functions</div>
+          </div>
+
+          <div class="io-grid">
+            <div class="io-pane">
+              <label for="caseInput" class="pane-label">Input Text</label>
+              <textarea id="caseInput" class="textarea-box" placeholder="Type or paste text to convert..." rows="10"></textarea>
+            </div>
+            <div class="io-pane">
+              <label for="caseOutput" class="pane-label">Converted Text</label>
+              <textarea id="caseOutput" class="output-box" readonly placeholder="Result will appear here..." rows="10"></textarea>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <div class="action-group-left" id="caseButtonContainer">
+              <button class="btn btn-secondary" data-case="upper" type="button">UPPER</button>
+              <button class="btn btn-secondary" data-case="lower" type="button">lower</button>
+              <button class="btn btn-secondary" data-case="title" type="button">Title</button>
+              <button class="btn btn-secondary" data-case="camel" type="button">camelCase</button>
+              <button class="btn btn-secondary" data-case="snake" type="button">snake_case</button>
+              <button class="btn btn-secondary" data-case="kebab" type="button">kebab-case</button>
+              <button class="btn btn-secondary" data-case="pascal" type="button">PascalCase</button>
+            </div>
+
+            <div class="action-group-right">
+              <button id="caseCopyBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
+              <button id="caseClearBtn" class="btn btn-ghost" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="status-line" id="caseStatus" aria-live="polite"></div>
+        </section>
+
+        <!-- 4. Base64 Encode/Decode Panel -->
+        <section id="panel-base64" class="tool-card" role="tabpanel" aria-labelledby="tab-base64" tabindex="0">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h1 class="card-title">Base64 Encoder / Decoder</h1>
+            </div>
+            <div id="base64Badge" class="badge badge-neutral">Unicode Safe</div>
+          </div>
+
+          <div class="io-grid">
+            <div class="io-pane">
+              <label for="base64Input" class="pane-label">Input (Text or Base64)</label>
+              <textarea id="base64Input" class="textarea-box" placeholder="Hello world, नमस्ते, నమస్కారం 🚀" rows="10"></textarea>
+            </div>
+            <div class="io-pane">
+              <label for="base64Output" class="pane-label">Result</label>
+              <textarea id="base64Output" class="output-box" readonly placeholder="Result will appear here..." rows="10"></textarea>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <div class="action-group-left">
+              <button id="base64EncodeBtn" class="btn btn-primary" type="button">Encode to Base64</button>
+              <button id="base64DecodeBtn" class="btn btn-secondary" type="button">Decode from Base64</button>
+            </div>
+
+            <div class="action-group-right">
+              <button id="base64CopyBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
+              <button id="base64ClearBtn" class="btn btn-ghost" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="status-line" id="base64Status" aria-live="polite"></div>
+        </section>
+
+        <!-- 5. Colour Picker Panel -->
+        <section id="panel-color" class="tool-card" role="tabpanel" aria-labelledby="tab-color" tabindex="0">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h1 class="card-title">Colour Picker &amp; Contrast</h1>
+            </div>
+            <div id="colorContrastBadge" class="badge badge-success">WCAG AA &amp; AAA</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+              <div style="display: flex; align-items: center; gap: 16px;">
+                <label for="colorPickerInput" class="sr-only">Choose color</label>
+                <input type="color" id="colorPickerInput" value="#7c3aed" style="width: 54px; height: 54px; border: none; border-radius: var(--radius-md); cursor: pointer; background: transparent;">
+                <div style="flex: 1;">
+                  <div style="font-size: var(--font-size-12); color: var(--text-muted);">Active Swatch</div>
+                  <div id="activeColorName" style="font-family: var(--font-mono); font-size: var(--font-size-18); font-weight: 600;">#7c3aed</div>
+                </div>
+              </div>
+
+              <!-- HEX Field -->
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <label for="colorHexInput" style="width: 50px; font-weight: 600; font-size: 12px; color: var(--text-secondary);">HEX</label>
+                <input type="text" id="colorHexInput" class="text-input" value="#7c3aed" style="flex: 1;" spellcheck="false">
+                <button id="colorCopyHexBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
+              </div>
+
+              <!-- RGB Field -->
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <label for="colorRgbInput" style="width: 50px; font-weight: 600; font-size: 12px; color: var(--text-secondary);">RGB</label>
+                <input type="text" id="colorRgbInput" class="text-input" value="rgb(124, 58, 237)" style="flex: 1;" spellcheck="false">
+                <button id="colorCopyRgbBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
+              </div>
+
+              <!-- HSL Field -->
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <label for="colorHslInput" style="width: 50px; font-weight: 600; font-size: 12px; color: var(--text-secondary);">HSL</label>
+                <input type="text" id="colorHslInput" class="text-input" value="hsl(262, 83%, 58%)" style="flex: 1;" spellcheck="false">
+                <button id="colorCopyHslBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
+              </div>
+            </div>
+
+            <!-- Preview Swatch & Contrast Card -->
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <div id="colorSwatchPreview" class="color-swatch-box" style="height: 120px; border-radius: var(--radius-md); background-color: #7c3aed; display: flex; align-items: center; justify-content: space-around; padding: 12px; border: 1px solid var(--border-glass);">
+                <div id="swatchWhiteText" style="color: #ffffff; font-weight: 600; font-size: 16px;">White Text</div>
+                <div id="swatchBlackText" style="color: #000000; font-weight: 600; font-size: 16px;">Black Text</div>
+              </div>
+
+              <!-- WCAG Contrast Ratios -->
+              <div style="background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 12px; color: var(--text-secondary);">Against White (#FFF):</span>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <strong id="contrastWhiteRatio" style="font-family: var(--font-mono);">4.62 : 1</strong>
+                    <span id="contrastWhiteBadge" class="badge badge-success">AA</span>
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                  <span style="font-size: 12px; color: var(--text-secondary);">Against Black (#000):</span>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <strong id="contrastBlackRatio" style="font-family: var(--font-mono);">4.55 : 1</strong>
+                    <span id="contrastBlackBadge" class="badge badge-success">AA</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <div class="action-group-left">
+              <button id="colorRandomBtn" class="btn btn-secondary" type="button">Random Colour</button>
+            </div>
+            <div class="action-group-right">
+              <button id="colorClearBtn" class="btn btn-ghost" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div class="status-line" id="colorStatus" aria-live="polite"></div>
+        </section>
+
+        <!-- 6. URL Encode / Decode Panel -->
+        <section id="panel-urlenc" class="tool-card" role="tabpanel" aria-labelledby="tab-urlenc" tabindex="0">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h1 class="card-title">URL Encoder / Decoder</h1>
+            </div>
+            <div id="urlBadge" class="badge badge-neutral">Ready</div>
+          </div>
+
+          <div class="io-grid">
+            <div class="io-pane">
+              <label for="urlInput" class="pane-label">Input URL or Text</label>
+              <textarea id="urlInput" class="textarea-box" placeholder="https://example.com/search?q=developer tools&filter=all" rows="10"></textarea>
+            </div>
+            <div class="io-pane">
+              <label for="urlOutput" class="pane-label">Result</label>
+              <textarea id="urlOutput" class="output-box" readonly placeholder="Result will appear here..." rows="10"></textarea>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <div class="action-group-left">
+              <button id="urlEncodeBtn" class="btn btn-primary" type="button">Encode URL</button>
+              <button id="urlDecodeBtn" class="btn btn-secondary" type="button">Decode URL</button>
+            </div>
+            <div class="action-group-right">
+              <button id="urlCopyBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
+              <button id="urlClearBtn" class="btn btn-ghost" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="status-line" id="urlStatus" aria-live="polite"></div>
+        </section>
+
+        <!-- 7. UUID v4 Generator Panel -->
+        <section id="panel-uuid" class="tool-card" role="tabpanel" aria-labelledby="tab-uuid" tabindex="0">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h1 class="card-title">UUID v4 Generator</h1>
+            </div>
+            <div id="uuidBadge" class="badge badge-neutral">RFC 4122</div>
+          </div>
+
+          <div class="io-pane">
+            <div class="pane-label">
+              <label for="uuidCountInput">Quantity (1 to 20):</label>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="range" id="uuidRangeInput" min="1" max="20" value="5" style="accent-color: var(--color-violet);">
+                <input type="number" id="uuidCountInput" class="text-input" min="1" max="20" value="5" style="width: 60px;">
+              </div>
+            </div>
+            <div id="uuidOutputContainer" class="output-box" style="display: flex; flex-direction: column; gap: 8px; min-height: 200px;">
+              <!-- Generated list of UUIDs -->
+            </div>
+          </div>
+
+          <div class="action-row">
+            <div class="action-group-left">
+              <button id="uuidGenerateBtn" class="btn btn-primary" type="button">Generate New UUIDs</button>
+            </div>
+            <div class="action-group-right">
+              <button id="uuidCopyAllBtn" class="btn btn-secondary btn-copy" type="button">Copy All</button>
+              <button id="uuidClearBtn" class="btn btn-ghost" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="status-line" id="uuidStatus" aria-live="polite"></div>
+        </section>
+
+        <!-- 8. Timestamp Converter Panel -->
+        <section id="panel-timestamp" class="tool-card" role="tabpanel" aria-labelledby="tab-timestamp" tabindex="0">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h1 class="card-title">Timestamp Converter</h1>
+            </div>
+            <div id="timestampBadge" class="badge badge-neutral">Unix &harr; ISO</div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div style="display: flex; flex-direction: column; gap: 14px;">
+              <label for="timestampUnixInput" class="pane-label">Unix Timestamp (seconds or ms)</label>
+              <input type="text" id="timestampUnixInput" class="text-input" placeholder="e.g. 1772108800 or 1772108800000">
+              <button id="timestampFromUnixBtn" class="btn btn-primary" type="button">Convert to Human Date &rarr;</button>
+
+              <hr style="border: 0; border-top: 1px solid var(--border-glass); margin: 6px 0;">
+
+              <label for="timestampDateInput" class="pane-label">Date String / Picker</label>
+              <input type="datetime-local" id="timestampDateInput" class="text-input">
+              <button id="timestampFromDateBtn" class="btn btn-secondary" type="button">Convert to Unix Timestamp &rarr;</button>
+            </div>
+
+            <div style="background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+              <div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Unix Seconds</div>
+                <div id="tsResultSeconds" style="font-family: var(--font-mono); font-size: 16px; font-weight: 600; word-break: break-all;">-</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Unix Milliseconds</div>
+                <div id="tsResultMs" style="font-family: var(--font-mono); font-size: 16px; font-weight: 600; word-break: break-all;">-</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">ISO 8601 (UTC)</div>
+                <div id="tsResultIso" style="font-family: var(--font-mono); font-size: 14px; font-weight: 500; word-break: break-all;">-</div>
+              </div>
+              <div>
+                <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Local Time</div>
+                <div id="tsResultLocal" style="font-family: var(--font-mono); font-size: 14px; font-weight: 500; word-break: break-all;">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <div class="action-group-left">
+              <button id="timestampNowBtn" class="btn btn-secondary" type="button">Set to Now</button>
+            </div>
+            <div class="action-group-right">
+              <button id="timestampCopyBtn" class="btn btn-secondary btn-copy" type="button">Copy Details</button>
+              <button id="timestampClearBtn" class="btn btn-ghost" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="status-line" id="timestampStatus" aria-live="polite"></div>
+        </section>
+
+        <!-- 9. Hash Generator Panel -->
+        <section id="panel-hash" class="tool-card" role="tabpanel" aria-labelledby="tab-hash" tabindex="0">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h1 class="card-title">Hash Generator</h1>
+            </div>
+            <div id="hashBadge" class="badge badge-neutral">crypto.subtle</div>
+          </div>
+
+          <div class="io-pane">
+            <label for="hashInput" class="pane-label">Input Text</label>
+            <textarea id="hashInput" class="textarea-box" placeholder="Type or paste text to generate cryptographic hashes..." rows="4"></textarea>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 10px;">
+            <!-- SHA-1 -->
+            <div style="background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">SHA-1</div>
+                <div id="hashSha1Output" style="font-family: var(--font-mono); font-size: 13px; color: var(--text-primary); word-break: break-all;">-</div>
+              </div>
+              <button id="hashSha1CopyBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
+            </div>
+
+            <!-- SHA-256 -->
+            <div style="background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">SHA-256</div>
+                <div id="hashSha256Output" style="font-family: var(--font-mono); font-size: 13px; color: var(--text-primary); word-break: break-all;">-</div>
+              </div>
+              <button id="hashSha256CopyBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
+            </div>
+
+            <!-- SHA-512 -->
+            <div style="background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+              <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600;">SHA-512</div>
+                <div id="hashSha512Output" style="font-family: var(--font-mono); font-size: 13px; color: var(--text-primary); word-break: break-all;">-</div>
+              </div>
+              <button id="hashSha512CopyBtn" class="btn btn-secondary btn-copy" type="button">Copy</button>
+            </div>
+          </div>
+
+          <div class="action-row">
+            <div class="action-group-left">
+              <button id="hashComputeBtn" class="btn btn-primary" type="button">Compute Hashes</button>
+            </div>
+            <div class="action-group-right">
+              <button id="hashClearBtn" class="btn btn-ghost" type="button">Clear</button>
+            </div>
+          </div>
+
+          <div class="status-line" id="hashStatus" aria-live="polite"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- Command Palette Modal -->
+  <div id="paletteModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="paletteTitle">
+    <div class="modal-card">
+      <div class="palette-header">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted);">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <span id="paletteTitle" class="sr-only">Command Palette</span>
+        <input type="text" id="paletteInput" class="palette-input" placeholder="Type a tool name..." autocomplete="off">
+        <span class="kbd-badge">ESC</span>
+      </div>
+      <ul id="paletteResults" class="palette-results" role="listbox">
+        <!-- Filtered tools -->
+      </ul>
+      <div class="palette-footer">
+        <span>Use <span class="kbd-badge">&uarr;</span> <span class="kbd-badge">&darr;</span> to navigate</span>
+        <span><span class="kbd-badge">&crarr;</span> to select</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shortcuts Modal -->
+  <div id="shortcutsModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="shortcutsTitle">
+    <div class="modal-card" style="padding: 24px;">
+      <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-glass); padding-bottom: 12px;">
+        <h2 id="shortcutsTitle">Keyboard Shortcuts</h2>
+        <button id="closeShortcutsBtn" class="btn btn-ghost" type="button" style="padding: 4px 8px;">&times;</button>
+      </div>
+      <table class="shortcuts-table">
+        <tbody>
+          <tr>
+            <td><span class="kbd-badge">Alt + 1..9</span></td>
+            <td>Switch to Tool 1 through 9</td>
+          </tr>
+          <tr>
+            <td><span class="kbd-badge">Ctrl + K</span> / <span class="kbd-badge">Cmd + K</span></td>
+            <td>Open Command Palette</td>
+          </tr>
+          <tr>
+            <td><span class="kbd-badge">?</span></td>
+            <td>Open this Shortcuts Modal</td>
+          </tr>
+          <tr>
+            <td><span class="kbd-badge">Esc</span></td>
+            <td>Close Active Modal</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top: 18px; text-align: right;">
+        <button id="closeShortcutsBottomBtn" class="btn btn-secondary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+  <!-- Main ES Module Entry Point -->
+  <script type="module" src="/static/js/main.js"></script>
+</body>
+</html>
