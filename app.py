@@ -4,6 +4,14 @@ import json
 from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
+@app.after_request
+def add_no_cache(response):
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.route("/")
 def index():

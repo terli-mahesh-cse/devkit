@@ -328,8 +328,9 @@
 }
 
 @media (max-width: 900px) {
-  .color-grid {
-    grid-template-columns: 1fr;
+  .io-grid, .color-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
   }
 }
 
@@ -462,8 +463,8 @@
     padding: 16px 14px;
   }
 
-  .io-grid {
-    grid-template-columns: 1fr;
+  .io-grid, .color-grid {
+    grid-template-columns: 1fr !important;
     gap: 16px;
   }
 

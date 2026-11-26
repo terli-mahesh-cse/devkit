@@ -12,11 +12,11 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   
   <!-- CSS Stylesheets -->
-  <link rel="stylesheet" href="/static/css/tokens.css">
-  <link rel="stylesheet" href="/static/css/base.css">
-  <link rel="stylesheet" href="/static/css/layout.css">
-  <link rel="stylesheet" href="/static/css/components.css">
-  <link rel="stylesheet" href="/static/css/animations.css">
+  <link rel="stylesheet" href="/static/css/tokens.css?v=3">
+  <link rel="stylesheet" href="/static/css/base.css?v=3">
+  <link rel="stylesheet" href="/static/css/layout.css?v=3">
+  <link rel="stylesheet" href="/static/css/components.css?v=3">
+  <link rel="stylesheet" href="/static/css/animations.css?v=3">
 </head>
 <body>
   <div class="app-container">
@@ -419,8 +419,8 @@
             <div id="timestampBadge" class="badge badge-neutral">Unix &harr; ISO</div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-            <div style="display: flex; flex-direction: column; gap: 14px;">
+          <div class="io-grid">
+            <div class="io-pane">
               <label for="timestampUnixInput" class="pane-label">Unix Timestamp (seconds or ms)</label>
               <input type="text" id="timestampUnixInput" class="text-input" placeholder="e.g. 1772108800 or 1772108800000">
               <button id="timestampFromUnixBtn" class="btn btn-primary" type="button">Convert to Human Date &rarr;</button>
@@ -432,7 +432,7 @@
               <button id="timestampFromDateBtn" class="btn btn-secondary" type="button">Convert to Unix Timestamp &rarr;</button>
             </div>
 
-            <div style="background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+            <div class="io-pane" style="background: var(--bg-input); border: 1px solid var(--border-glass); border-radius: var(--radius-md); padding: 16px; display: flex; flex-direction: column; gap: 12px;">
               <div>
                 <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase;">Unix Seconds</div>
                 <div id="tsResultSeconds" style="font-family: var(--font-mono); font-size: 16px; font-weight: 600; word-break: break-all;">-</div>
@@ -582,6 +582,6 @@
   <div id="toastContainer" class="toast-container" aria-live="polite"></div>
 
   <!-- Main ES Module Entry Point -->
-  <script type="module" src="/static/js/main.js"></script>
+  <script type="module" src="/static/js/main.js?v=3"></script>
 </body>
 </html>

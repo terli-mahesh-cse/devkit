@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DevKit Test Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: #0c0a1f;
+      color: #f8fafc;
+      padding: 32px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      color: #f8fafc;
+      margin-bottom: 8px;
+    }
+    .summary-card {
+      background: rgba(26, 22, 56, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .badge-pass {
+      background: rgba(34, 197, 94, 0.2);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+    .badge-fail {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-weight: 600;
+    }
+    .suite-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px;
+      margin: 24px 0 12px;
+      color: #c084fc;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 6px;
+    }
+    .test-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+      background: rgba(16, 14, 40, 0.6);
+      font-size: 13px;
+    }
+    .test-pass {
+      border-left: 3px solid #22c55e;
+    }
+    .test-fail {
+      border-left: 3px solid #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+    .status-icon {
+      font-weight: 700;
+    }
+    .status-icon.pass { color: #22c55e; }
+    .status-icon.fail { color: #ef4444; }
+  </style>
+</head>
+<body>
+  <h1>DevKit Automated Test Suite</h1>
+  <p style="color: #94a3b8; font-size: 13px; margin-bottom: 20px;">
+    Unit &amp; regression tests for pure functions: Case converters, Base64 Unicode chunking, Colour models, Counter edge cases, JSON, URL, UUID, and Hash.
+  </p>
+
+  <div class="summary-card" id="summaryCard">
+    <div>
+      <span style="font-size: 14px; font-weight: 600;" id="summaryText">Running tests...</span>
+      <div style="font-size: 12px; color: #94a3b8;" id="timingText"></div>
+    </div>
+    <div id="summaryBadge" class="badge-pass" style="display: none;">ALL TESTS PASSED</div>
+  </div>
+
+  <div id="testOutput"></div>
+
+  <script type="module">
+    import { upper, lower, title, camel, snake, kebab, pascal, toWords } from './case.js';
+    import { b64encode, b64decode } from './base64.js';
+    import { hexToRgb, rgbToHex, rgbToHsl, hslToRgb, getContrastRatio, getLuminance } from './color.js';
+    import { calculateMetrics } from './counter.js';
+    import { formatJsonLocal, minifyJsonLocal } from './json.js';
+    import { urlEncode, urlDecode } from './urlenc.js';
+    import { generateUuidV4 } from './uuid.js';
+    import { computeHash } from './hash.js';
+
+    const results = [];
+    const outputEl = document.getElementById('testOutput');
+
+    function assert(description, actual, expected) {
+      const passed = JSON.stringify(actual) === JSON.stringify(expected);
+      results.push({ description, passed, actual, expected });
+      return passed;
+    }
+
+    async function runSuite() {
+      const startTime = performance.now();
+
+      // Suite 1: Case Converters (All 7 styles)
+      const suite1 = [
+        ['upper("hello world")', upper('hello world'), 'HELLO WORLD'],
+        ['lower("HELLO WORLD")', lower('HELLO WORLD'), 'hello world'],
+        ['title("hello world of devkit")', title('hello world of devkit'), 'Hello World Of Devkit'],
+        ['camel("hello world of devkit")', camel('hello world of devkit'), 'helloWorldOfDevkit'],
+        ['snake("hello world of devkit")', snake('hello world of devkit'), 'hello_world_of_devkit'],
+        ['kebab("hello world of devkit")', kebab('hello world of devkit'), 'hello-world-of-devkit'],
+        ['pascal("hello world of devkit")', pascal('hello world of devkit'), 'HelloWorldOfDevkit'],
+        ['camel from kebab: camel("kebab-case-text")', camel('kebab-case-text'), 'kebabCaseText'],
+        ['snake from camel: snake("camelCaseText")', snake('camelCaseText'), 'camel_case_text'],
+        ['Case converters handle empty string', camel(''), ''],
+        ['Case converters handle single word', pascal('devkit'), 'Devkit']
+      ];
+      renderGroup('1. Case Converter Pure Functions', suite1);
+
+      // Suite 2: Base64 Unicode Roundtrip (Emoji, Hindi, Telugu, chunked)
+      const unicodeCases = [
+        'Hello World!',
+        'Emoji: 🚀 🌟 🔥 💻 🎨 🕉️',
+        'Hindi: नमस्ते दुनिया, आप कैसे हैं?',
+        'Telugu: నమస్కారం ప్రపంచం, దేవ్ కిట్ స్వాగతం!',
+        'Mixed Multilingual: Hello नमस्ते నమస్కారం 🚀🎉',
+        'Large chunk test: ' + 'A'.repeat(25000)
+      ];
+
+      const suite2 = unicodeCases.map(text => {
+        const encoded = b64encode(text);
+        const decoded = b64decode(encoded);
+        return [`Base64 roundtrip for: "${text.slice(0, 30)}..."`, decoded, text];
+      });
+
+      // Invalid Base64 error test
+      let invalidErrorCaught = false;
+      try {
+        b64decode('This is not valid base64!!!');
+      } catch (err) {
+        invalidErrorCaught = true;
+      }
+      suite2.push(['Base64 throws clear error on invalid base64 input', invalidErrorCaught, true]);
+      renderGroup('2. Unicode-Safe Chunked Base64', suite2);
+
+      // Suite 3: Colour Conversions and WCAG
+      const rgbViolet = hexToRgb('#7c3aed');
+      const hexBack = rgbToHex(124, 58, 237);
+      const hslViolet = rgbToHsl(124, 58, 237);
+      const rgbFromHsl = hslToRgb(hslViolet.h, hslViolet.s, hslViolet.l);
+      const contrastVioletWhite = getContrastRatio({ r: 124, g: 58, b: 237 }, { r: 255, g: 255, b: 255 });
+
+      const suite3 = [
+        ['hexToRgb("#7c3aed")', rgbViolet, { r: 124, g: 58, b: 237 }],
+        ['rgbToHex(124, 58, 237)', hexBack, '#7c3aed'],
+        ['rgbToHsl(124, 58, 237).h is around 262', Math.abs(hslViolet.h - 262) <= 1, true],
+        ['hslToRgb roundtrip matches within +/- 2', Math.abs(rgbFromHsl.r - 124) <= 2 && Math.abs(rgbFromHsl.b - 237) <= 2, true],
+        ['WCAG Contrast against white is ~5.70', Math.abs(contrastVioletWhite - 5.70) < 0.1, true],
+        ['hexToRgb handles 3-char hex "#f00"', hexToRgb('#f00'), { r: 255, g: 0, b: 0 }],
+        ['hexToRgb returns null on invalid hex', hexToRgb('xyz'), null]
+      ];
+      renderGroup('3. Colour Conversions & WCAG Contrast', suite3);
+
+      // Suite 4: Word Counter Edge Cases
+      const emptyMetrics = calculateMetrics('');
+      const spaceMetrics = calculateMetrics('    \n\n\t   ');
+      const fourWordText = 'First    word   second   word.';
+      const fourWordMetrics = calculateMetrics(fourWordText);
+      const multiSpaceText = 'First    word   second   word.\n\nThird paragraph!';
+      const multiMetrics = calculateMetrics(multiSpaceText);
+
+      const suite4 = [
+        ['Empty text returns 0 words', emptyMetrics.words, 0],
+        ['Empty text returns 0 characters', emptyMetrics.charsWithSpaces, 0],
+        ['Whitespace-only text returns 0 words', spaceMetrics.words, 0],
+        ['Whitespace-only characters counted correctly', spaceMetrics.charsWithSpaces > 0, true],
+        ['Multiple spaces counted as 4 words', fourWordMetrics.words, 4],
+        ['Multiple newlines counted as 2 paragraphs', multiMetrics.paragraphs, 2],
+        ['Sentences correctly identified', multiMetrics.sentences, 2],
+        ['Reading time for small text is "< 1 min"', multiMetrics.readingTimeText, '< 1 min']
+      ];
+      renderGroup('4. Word Counter Edge Cases', suite4);
+
+      // Suite 5: JSON Formatter Local
+      const jsonRes = formatJsonLocal('{"b":2,"a":1}', 2, true);
+      const jsonMin = minifyJsonLocal('{\n  "b": 2,\n  "a": 1\n}');
+      const jsonErr = formatJsonLocal('{"bad": }');
+
+      const suite5 = [
+        ['formatJsonLocal sorts keys and indents', jsonRes.ok && jsonRes.value.includes('"a": 1'), true],
+        ['minifyJsonLocal removes whitespace', jsonMin.ok && jsonMin.value === '{"b":2,"a":1}', true],
+        ['formatJsonLocal returns error with line/column for invalid JSON', jsonErr.ok === false && !!jsonErr.error, true]
+      ];
+      renderGroup('5. JSON Formatter & Minifier', suite5);
+
+      // Suite 6: URL & UUID
+      const encUrl = urlEncode('https://example.com/?q=hello world');
+      const decUrl = urlDecode(encUrl);
+      const uuid1 = generateUuidV4();
+      const uuidV4Regex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+      const suite6 = [
+        ['urlEncode escapes spaces and query chars', encUrl.includes('%20'), true],
+        ['urlDecode restores original URL', decUrl, 'https://example.com/?q=hello world'],
+        ['generateUuidV4 matches RFC 4122 v4 pattern', uuidV4Regex.test(uuid1), true]
+      ];
+      renderGroup('6. URL Encode/Decode & UUID v4', suite6);
+
+      // Suite 7: Cryptographic Hashes (crypto.subtle)
+      const sha256Hello = await computeHash('SHA-256', 'hello world');
+      const sha1Hello = await computeHash('SHA-1', 'hello world');
+
+      const suite7 = [
+        ['SHA-256("hello world") matches known standard vector', sha256Hello, 'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9'],
+        ['SHA-1("hello world") matches standard vector', sha1Hello, '2aae6c35c94fcfb415dbe95f408b9ce91ee846ed']
+      ];
+      renderGroup('7. Cryptographic Hashes (crypto.subtle)', suite7);
+
+      const elapsed = (performance.now() - startTime).toFixed(1);
+      const passedCount = results.filter(r => r.passed).length;
+      const failedCount = results.length - passedCount;
+
+      const summaryText = document.getElementById('summaryText');
+      const timingText = document.getElementById('timingText');
+      const summaryBadge = document.getElementById('summaryBadge');
+
+      summaryText.textContent = `Completed ${results.length} tests: ${passedCount} passed, ${failedCount} failed`;
+      timingText.textContent = `Execution time: ${elapsed} ms`;
+      summaryBadge.style.display = 'inline-block';
+
+      if (failedCount === 0) {
+        summaryBadge.textContent = 'ALL TESTS PASSED';
+        summaryBadge.className = 'badge-pass';
+        window.__TESTS_PASSED__ = true;
+      } else {
+        summaryBadge.textContent = `${failedCount} TESTS FAILED`;
+        summaryBadge.className = 'badge-fail';
+        window.__TESTS_PASSED__ = false;
+      }
+
+      window.__TEST_RESULTS__ = { total: results.length, passed: passedCount, failed: failedCount, elapsed };
+    }
+
+    function renderGroup(title, tests) {
+      const titleEl = document.createElement('h2');
+      titleEl.className = 'suite-title';
+      titleEl.textContent = title;
+      outputEl.appendChild(titleEl);
+
+      tests.forEach(([desc, actual, expected]) => {
+        const passed = assert(desc, actual, expected);
+        const row = document.createElement('div');
+        row.className = `test-row ${passed ? 'test-pass' : 'test-fail'}`;
+        row.innerHTML = `
+          <span>${escapeHtml(desc)}</span>
+          <span class="status-icon ${passed ? 'pass' : 'fail'}">${passed ? '✓ PASS' : '✗ FAIL'}</span>
+        `;
+        outputEl.appendChild(row);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    runSuite();
+  </script>
+</body>
+</html>
